@@ -1,57 +1,215 @@
-# Unit 6 | Assignment - What's the Weather Like?
+# Weather By Latitude
+Visualization global weather patterns by latitude
 
-## Background
+## Summary
+Deployed Summary: [Weather By Latitude](https://faznaimov.github.io/Weather-Py/ "Weather By Latitude")
 
-Whether financial, political, or social -- data's true power lies in its ability to answer questions definitively. So let's take what you've learned about Python requests, APIs, and JSON traversals to answer a fundamental question: "What's the weather like as we approach the equator?"
+An analysis of weather patterns using python, the OpenWeatherMap API, and citypy to visualize trends in temperature, humidity, cloudiness, and windyness by latitude
 
-Now, we know what you may be thinking: _"Duh. It gets hotter..."_
+## Analysis
+- Average temperature generally increases the closer a location is to the equator
+- The variance of temperature ranges appears to increase the further a location is from the equator. Average temperatures for locations within ~5 degrees of the equator only vary by about 20 degrees Fahrenheit, while temperatures around 70 degress latitude vary from about -30 degrees to 35 degress Fahrenheit.
+- Their are not strongly discernable trends between latitude and humidity, cloudiness, and windiness. However there may be a loose correlation between increased humidity at higher latitudes and increased windiness further from the equator.
 
-But, if pressed, how would you **prove** it?
+Note: For this analysis I used the OpenWeatherMap APIs 5 day forecast to ensure that temperatures and other data points were averaged out for all times of day. Ideally historical data would be used, but that data is only available at a cost. Using the historical weather data may be a future improvement.
 
-![Equator](Images/equatorsign.png)
+## Generate List of Cities
 
-## WeatherPy
+```python
+# Lists holding coordinates and cities
+coordinates = []
+cities = []
 
-In this example, you'll be creating a Python script to visualize the weather of 500+ cities across the world of varying distance from the equator. To accomplish this, you'll be utilizing a [simple Python library](https://pypi.python.org/pypi/citipy), the [OpenWeatherMap API](https://openweathermap.org/api), and a little common sense to create a representative model of weather across world cities.
+# Create a set of random lat and lon combinations
+lat = np.random.uniform(low=-90.000, high=90.000, size=1500)
+lon = np.random.uniform(low=-180.000, high=180.000, size=1500)
+coordinates = zip(lat, lon)
 
-Your objective is to build a series of scatter plots to showcase the following relationships:
+# Identify nearest city for each lat, lon combination
+for coordinate_pair in coordinates:
+    lat, lon = coordinate_pair
+    
+    city = citipy.nearest_city(lat, lon).city_name
+    
+    # Replace spaces with %20 to create url correctly 
+    city = city.replace(" ", "%20")
+    
+    # If the city is unique, then add it to a our cities list
+    if city not in cities:
 
-* Temperature (F) vs. Latitude
-* Humidity (%) vs. Latitude
-* Cloudiness (%) vs. Latitude
-* Wind Speed (mph) vs. Latitude
+        cities.append(city)
 
-Your final notebook must:
+# Print the city count to confirm sufficient count
+len(cities)
+```
 
-* Randomly select **at least** 500 unique (non-repeat) cities based on latitude and longitude.
-* Perform a weather check on each of the cities using a series of successive API calls.
-* Include a print log of each city as it's being processed with the city number and city name.
-* Save both a CSV of all data retrieved and png images for each scatter plot.
+## Perform API Calls to OpenWeatherMap
 
-As final considerations:
 
-* You must complete your analysis using a Jupyter notebook.
-* You must use the Matplotlib or Pandas plotting libraries.
-* You must include a written description of three observable trends based on the data.
-* You must use proper labeling of your plots, including aspects like: Plot Titles (with date of analysis) and Axes Labels.
-* See [Example Solution](WeatherPy_Example.pdf) for a reference on expected format.
+```python
+# Create empty lists to append the API data into lists 
+city_name = []
+cloudiness = []
+country = []
+date = []
+humidity = []
+lat = []
+lng = []
+max_temp = []
+wind_speed = []
 
-## Hints and Considerations
+# Starting URL for Weather Map API Call
+url = "http://api.openweathermap.org/data/2.5/weather?units=Imperial&APPID=" + api_key
 
-* The city data is generated based on random coordinates; as such, your outputs will not be an exact match to the provided starter notebook.
+# Will keep the count of records
+record = 1
 
-* You may want to start this assignment by refreshing yourself on the [geographic coordinate system](http://desktop.arcgis.com/en/arcmap/10.3/guide-books/map-projections/about-geographic-coordinate-systems.htm).
+# Log file print statement
+print("Beginning Data Retrieval")
+print("-------------------------------")
 
-* Next, spend the requisite time necessary to study the OpenWeatherMap API. Based on your initial study, you should be able to answer  basic questions about the API: Where do you request the API key? Which Weather API in particular will you need? What URL endpoints does it expect? What JSON structure does it respond with? Before you write a line of code, you should be aiming to have a crystal clear understanding of your intended outcome.
+# Loop through the cities in the city list
+for city in cities:
 
-* A starter code for Citipy has been provided. However, if you're craving an extra challenge, push yourself to learn how it works: [citipy Python library](https://pypi.python.org/pypi/citipy). Before you try to incorporate the library into your analysis, start by creating simple test cases outside your main script to confirm that you are using it correctly. Too often, when introduced to a new library, students get bogged down by the most minor of errors -- spending hours investigating their entire code -- when, in fact, a simple and focused test would have shown their basic utilization of the library was wrong from the start. Don't let this be you!
 
-* Part of our expectation in this challenge is that you will use critical thinking skills to understand how and why we're recommending the tools we are. What is Citipy for? Why would you use it in conjunction with the OpenWeatherMap API? How would you do so?
+    try:
+        # API request
+        response = requests.get(f"{url}&q={city}").json()
+        
+        # Append the data to lists
+        city_name.append(response["name"])
+        cloudiness.append(response["clouds"]["all"])
+        country.append(response["sys"]["country"])
+        date.append(response["dt"])
+        humidity.append(response["main"]["humidity"])
+        max_temp.append(response["main"]["temp_max"])
+        lat.append(response["coord"]["lat"])
+        lng.append(response["coord"]["lon"])
+        wind_speed.append(response["wind"]["speed"])
+        
+        city_record = response["name"]
 
-* In building your script, pay attention to the cities you are using in your query pool. Are you getting coverage of the full gamut of latitudes and longitudes? Or are you simply choosing 500 cities concentrated in one region of the world? Even if you were a geographic genius, simply rattling 500 cities based on your human selection would create a biased dataset. Be thinking of how you should counter this. (Hint: Consider the full range of latitudes).
+        print(f"Processing Record {record} | {city_record}")
+        print(f"{url}&q={city}")
 
-* Lastly, remember -- this is a challenging activity. Push yourself! If you complete this task, then you can safely say that you've gained a strong mastery of the core foundations of data analytics and it will only go better from here. Good luck!
+        # Increase counter by one
+        record= record + 1
 
-## Copyright
+        # Wait a second in loop to not over exceed rate limit of API
+        time.sleep(1.01)
 
-Data Boot Camp © 2018. All Rights Reserved.
+    except:
+        print("City not found. Skipping...")
+
+print("Data Retrieval Complete")
+```
+## Add results into DataFrame
+```python
+# Creating a dataframe
+df = pd.DataFrame({
+    "City": city_name,
+    "Cloudiness":cloudiness, 
+    "Country":country,
+    "Date":date, 
+    "Humidity": humidity,
+    "Lat":lat, 
+    "Lng":lng, 
+    "Max Temp": max_temp,
+    "Wind Speed":wind_speed
+})
+```
+
+## Plot Temperature vs. Latitude
+
+
+```python
+# Gettting lists of city latitudes and max temperature
+city_lat = df["Lat"]
+max_temp = df["Max Temp"]
+
+# Creating scatter plot
+plt.scatter(city_lat, max_temp, marker="o", facecolor="red",edgecolors="black")
+
+# Assigning title, lables and setting x and y limits (Making plot look pretty)
+plt.title("City Latitute vs. Max Temperature(F)")
+plt.xlabel("City Latitute")
+plt.ylabel("Max Temperature(F)")
+plt.grid()
+plt.xlim(-85,85)
+plt.ylim(0,110)
+plt.show()
+```
+
+
+![png](Output/latvsmax.png)
+
+
+## Plot Humidity vs. Latitude
+
+
+```python
+# Gettting lists of city latitudes and humidity
+lat = df["Lat"]
+hum = df["Humidity"]
+
+# Build the scatter plots for each city types
+plt.scatter(lat, hum, marker="o", facecolors="red", edgecolors="black")
+
+# Incorporate the other graph properties
+plt.grid()
+plt.xlim(-90,90)
+plt.ylim(0,110)
+plt.title("City Latitude vs. Humidity")
+plt.xlabel("City Latitude")
+plt.ylabel("Humidity")
+plt.show()
+```
+
+
+![png](Output/latvshum.png)
+
+
+## Plot Cloudiness vs. Latitude
+
+```python
+# Gettting lists of city latitudes and cloudiness
+lat = df["Lat"]
+cloud = df["Cloudiness"]
+
+# Build the scatter plots for each city types
+plt.scatter(lat, cloud, marker="o", facecolors="red", edgecolors="black")
+
+# Incorporate the other graph properties
+plt.grid()
+plt.xlim(-90,90)
+plt.ylim(-10,110)
+plt.title("City Latitude vs. Cloudiness")
+plt.xlabel("City Latitude")
+plt.ylabel("Cloudiness")
+plt.show()
+```
+
+![png](Output/latvscloud.png)
+
+
+## Plot Windiness vs. Latitude
+
+```python
+# Gettting lists of city latitudes Wind Speed
+lat = df["Lat"]
+wind = df["Wind Speed"]
+
+# Build the scatter plots for each city types
+plt.scatter(lat, wind, marker="o", facecolors="red", edgecolors="black")
+
+# Incorporate the other graph properties
+plt.grid()
+plt.xlim(-90,90)
+plt.ylim(-5,50)
+plt.title("City Latitude vs. Wind Speed")
+plt.xlabel("City Latitude")
+plt.ylabel("Wind Speed")
+plt.show()
+```
+
+![png](Output/latvswind.png)
