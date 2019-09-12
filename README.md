@@ -118,8 +118,10 @@ df = pd.DataFrame({
     "Wind Speed":wind_speed
 })
 ```
+## Final Dataset
+[CSV file](Output/fileOne.csv)
 
-## Plot Temperature vs. Latitude
+## Plot City Latitute vs. Max Temperature(F)
 
 
 ```python
@@ -144,7 +146,7 @@ plt.show()
 ![png](Output/latvsmax.png)
 
 
-## Plot Humidity vs. Latitude
+## Plot City Latitude vs. Humidity
 
 
 ```python
@@ -169,7 +171,7 @@ plt.show()
 ![png](Output/latvshum.png)
 
 
-## Plot Cloudiness vs. Latitude
+## Plot City Latitude vs. Cloudiness
 
 ```python
 # Gettting lists of city latitudes and cloudiness
@@ -192,7 +194,7 @@ plt.show()
 ![png](Output/latvscloud.png)
 
 
-## Plot Windiness vs. Latitude
+## City Latitude vs. Wind Speed
 
 ```python
 # Gettting lists of city latitudes Wind Speed
