@@ -1,9 +1,6 @@
 # Weather By Latitude
 Visualization global weather patterns by latitude
 
-## Summary
-Deployed Summary: [Weather By Latitude](https://faznaimov.github.io/Weather-Py/ "Weather By Latitude")
-
 An analysis of weather patterns using python, the OpenWeatherMap API, and citypy to visualize trends in temperature, humidity, cloudiness, and windyness by latitude
 
 ## Analysis
@@ -44,7 +41,6 @@ len(cities)
 ```
 
 ## Perform API Calls to OpenWeatherMap
-
 
 ```python
 # Create empty lists to append the API data into lists 
@@ -103,7 +99,9 @@ for city in cities:
 
 print("Data Retrieval Complete")
 ```
+
 ## Add results into DataFrame
+
 ```python
 # Creating a dataframe
 df = pd.DataFrame({
@@ -118,11 +116,11 @@ df = pd.DataFrame({
     "Wind Speed":wind_speed
 })
 ```
+
 ## Final Dataset
 [CSV file](Output/fileOne.csv)
 
 ## Plot City Latitute vs. Max Temperature(F)
-
 
 ```python
 # Gettting lists of city latitudes and max temperature
@@ -142,12 +140,10 @@ plt.ylim(0,110)
 plt.show()
 ```
 
-
 ![png](Output/latvsmax.png)
 
 
 ## Plot City Latitude vs. Humidity
-
 
 ```python
 # Gettting lists of city latitudes and humidity
@@ -166,7 +162,6 @@ plt.xlabel("City Latitude")
 plt.ylabel("Humidity")
 plt.show()
 ```
-
 
 ![png](Output/latvshum.png)
 
@@ -192,7 +187,6 @@ plt.show()
 ```
 
 ![png](Output/latvscloud.png)
-
 
 ## City Latitude vs. Wind Speed
 
