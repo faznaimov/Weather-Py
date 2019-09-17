@@ -1,7 +1,7 @@
 # Weather By Latitude
 Visualization global weather patterns by latitude
 
-An analysis of weather patterns using python, the OpenWeatherMap API, and citypy to visualize trends in temperature, humidity, cloudiness, and windyness by latitude
+An analysis of weather patterns using python, the OpenWeatherMap API, and CityPy to visualize trends in temperature, humidity, cloudiness, and windiness by latitude.
 
 ## Analysis
 - Average temperature generally increases the closer a location is to the equator
